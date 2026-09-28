@@ -1,0 +1,46 @@
+name: cafe-app-prod
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      target: production
+      args:
+        VITE_APP_NAME: "Coffee Platform"
+        VITE_SERVER_URL: "${VITE_SERVER_URL:-http://localhost:3000}"
+
+    image: cafe-app:prod
+
+    init: true
+    restart: unless-stopped
+
+    env_file:
+      - ./.env
+
+    environment:
+      APP_NAME: "Coffee Platform"
+      NODE_ENV: production
+      PORT: "3000"
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - catalog-assets:/app/server/public/assets
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "bun",
+          "-e",
+          "const r = await fetch('http://127.0.0.1:3000/health'); if (!r.ok) process.exit(1)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  catalog-assets:
