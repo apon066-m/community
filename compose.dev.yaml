@@ -1,0 +1,79 @@
+name: cafe-app-dev
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+
+    image: cafe-app:dev
+    init: true
+
+    env_file:
+      - ./.env
+
+    environment:
+      APP_NAME: "Coffee Platform"
+      NODE_ENV: "development"
+      PORT: "3000"
+
+      VITE_APP_NAME: "Coffee Platform"
+      VITE_SERVER_URL: "${VITE_SERVER_URL:-http://localhost:3000}"
+      CLIENT_ORIGIN: "${CLIENT_ORIGIN:-http://localhost:5173}"
+      BETTER_AUTH_URL: "${BETTER_AUTH_URL:-http://localhost:3000}"
+
+    ports:
+      - "127.0.0.1:5173:5173"
+      - "127.0.0.1:3000:3000"
+
+    volumes:
+      - ./server/public/assets:/app/server/public/assets
+
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "bun",
+          "-e",
+          "const responses = await Promise.all([fetch('http://127.0.0.1:5173'), fetch('http://127.0.0.1:3000/health')]); if (responses.some((r) => !r.ok)) process.exit(1)",
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+
+    develop:
+      watch:
+        - action: sync
+          path: ./client
+          target: /app/client
+          initial_sync: true
+          ignore:
+            - node_modules/
+            - dist/
+
+        - action: sync
+          path: ./server
+          target: /app/server
+          initial_sync: true
+          ignore:
+            - node_modules/
+            - dist/
+            - bun.lock
+            - public/assets/
+
+        - action: sync
+          path: ./shared
+          target: /app/shared
+          initial_sync: true
+          ignore:
+            - node_modules/
+            - dist/
+    networks:
+      - default # Cafe app internal network
+      - sandbox # Shared external services
+
+networks:
+  sandbox:
+    external: true
+    name: sizi-sandbox-db-network
