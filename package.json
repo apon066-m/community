@@ -1,0 +1,55 @@
+{
+  "name": "Assesment-3",
+  "version": "0.5.1",
+  "description": "A monorepo template built with Bun, Hono, Vite, and React",
+  "author": "Steve Simkins",
+  "license": "MIT",
+  "homepage": "https://github.com/stevedylandev/bhvr",
+  "packageManager": "bun@1.2.4",
+  "workspaces": [
+    "./server",
+    "./client",
+    "./shared"
+  ],
+  "scripts": {
+    "dev": "turbo dev",
+    "dev:client": "turbo dev --filter=client",
+    "dev:server": "turbo dev --filter=server",
+    "build": "turbo build",
+    "build:client": "turbo build --filter=client",
+    "build:server": "turbo build --filter=server",
+    "db:generate": "bun --env-file=.env --filter=server run db:generate",
+    "db:migrate": "bun --env-file=.env --filter=server run db:migrate",
+    "docker:dev": "docker compose -f compose.dev.yaml up --watch",
+    "docker:dev:build": "docker compose -f compose.dev.yaml up --build --watch",
+    "docker:dev:refresh": "docker compose -f compose.dev.yaml up -d --force-recreate --no-build app",
+    "docker:dev:restart": "docker compose -f compose.dev.yaml restart app",
+    "docker:dev:down": "docker compose -f compose.dev.yaml down --remove-orphans",
+    "docker:prod": "docker compose --env-file .env -f compose.prod.yaml up --build -d",
+    "docker:prod:down": "docker compose --env-file .env -f compose.prod.yaml down --remove-orphans",
+    "docker:prod:build": "docker build -f Dockerfile.prod -t cafe-app:prod .",
+    "build:shared": "turbo build --filter=shared",
+    "lint": "turbo lint",
+    "type-check": "turbo type-check",
+    "test": "turbo test",
+    "postinstall": "turbo build --filter=shared --filter=server"
+  },
+  "keywords": [
+    "bun",
+    "hono",
+    "react",
+    "vite",
+    "monorepo",
+    "turbo"
+  ],
+  "devDependencies": {
+    "bun-types": "latest",
+    "turbo": "^2.5.5"
+  },
+  "peerDependencies": {
+    "typescript": "^5.7.3"
+  },
+  "dependencies": {
+    "hono": "^4.13.7"
+  }
+}
