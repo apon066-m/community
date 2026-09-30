@@ -1,0 +1,41 @@
+{
+  "name": "server",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "types": "./dist/client.d.ts",
+      "default": "./dist/client.js"
+    }
+  },
+  "scripts": {
+    "dev": "concurrently \"bun --watch run src/index.ts\" \"tsc --watch\"",
+    "build": "tsc",
+    "test": "NODE_ENV=test bun test src",
+    "test:integration": "NODE_ENV=test RUN_DB_TESTS=1 bun test src/modules/auth/__tests__/auth.integration.test.ts src/modules/users/__tests__/users.integration.test.ts src/modules/authorization/__tests__/authorization.integration.test.ts src/modules/authorization/__tests__/authorization-admin.integration.test.ts src/modules/catalog/__tests__/catalog.integration.test.ts src/modules/favorites/__tests__/favorites.integration.test.ts src/modules/audit/__tests__/audit.integration.test.ts",
+    "db:seed": "bun run src/modules/catalog/catalog.seed.ts",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "auth:create-admin": "auth create-admin --config ./src/modules/auth/auth.ts",
+    "auth:create-admin:prod": "auth create-admin --config ./dist/modules/auth/auth.js"
+  },
+  "dependencies": {
+    "better-auth": "^1.7.5",
+    "drizzle-orm": "^0.45.2",
+    "hono": "^4.10.8",
+    "http-status-codes": "^2.3.0",
+    "postgres": "^3.4.9",
+    "shared": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "auth": "1.7.5",
+    "concurrently": "^10.0.5",
+    "drizzle-kit": "^0.31.10"
+  }
+}
